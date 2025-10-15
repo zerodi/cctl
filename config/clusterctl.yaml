@@ -1,0 +1,7 @@
+## -- Required workload cluster default settings -- ##
+PROXMOX_URL: "https://127.0.0.1:8006/"
+PROXMOX_TOKEN: "token@pve!token"
+PROXMOX_SECRET: "secret_token"
+
+EXP_CLUSTER_RESOURCE_SET: "true"
+CLUSTER_TOPOLOGY: "true"

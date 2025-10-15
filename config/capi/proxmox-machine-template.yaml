@@ -1,0 +1,56 @@
+apiVersion: infrastructure.cluster.x-k8s.io/v1alpha1
+kind: ProxmoxMachineTemplate
+metadata:
+  name: coffee-cluster-control-plane-template
+  namespace: default
+spec:
+  template:
+    spec:
+      disks:
+        bootVolume:
+          disk: scsi0
+          sizeGb: 40
+      format: qcow2
+      full: true
+      memoryMiB: 4096
+      network:
+        default:
+          bridge: vmbr0
+          model: virtio
+      numCores: 2
+      numSockets: 1
+      sourceNode: pve
+      templateID: 900
+      checks:
+        skipCloudInitStatus: true
+      metadataSettings:
+        providerIDInjection: true
+
+---
+apiVersion: infrastructure.cluster.x-k8s.io/v1alpha1
+kind: ProxmoxMachineTemplate
+metadata:
+  name: coffee-cluster-worker-template
+  namespace: default
+spec:
+  template:
+    spec:
+      disks:
+        bootVolume:
+          disk: scsi0
+          sizeGb: 80
+      format: qcow2
+      full: true
+      memoryMiB: 4096
+      network:
+        default:
+          bridge: vmbr0
+          model: virtio
+      numCores: 4
+      numSockets: 1
+      sourceNode: pve
+      templateID: 900
+      checks:
+        skipCloudInitStatus: true
+      metadataSettings:
+        providerIDInjection: true        

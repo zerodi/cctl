@@ -1,0 +1,14 @@
+{
+    "vmid": 900,
+    "name": "capi-talos-template",
+    "agent": 1,
+    "ostype": "l26",
+    "boot": "order=scsi0;ide2;net0",
+    "cores": 2,
+    "cpu": "x86-64-v2-AES",
+    "memory": 2048,
+    "ide2": "local:iso/talos-1.11.2-nocloud-amd64.iso,media=cdrom",
+    "net0": "virtio,bridge=vmbr0,firewall=1",
+    "scsi0": "local-zfs:8,iothread=1",
+    "scsihw": "virtio-scsi-single"
+}

@@ -1,0 +1,42 @@
+apiVersion: cluster.x-k8s.io/v1beta1
+kind: Cluster
+metadata:
+  name: coffee-cluster
+  namespace: default
+spec:
+  clusterNetwork:
+    pods:
+      cidrBlocks: ["10.244.0.0/16"]       # does not overlap with 192.168.100.0/24
+    services:
+      cidrBlocks: ["10.96.0.0/12"]
+  controlPlaneRef:
+    apiVersion: controlplane.cluster.x-k8s.io/v1alpha3
+    kind: TalosControlPlane
+    name: coffee-cluster-control-plane
+  infrastructureRef:
+    apiVersion: infrastructure.cluster.x-k8s.io/v1alpha1
+    kind: ProxmoxCluster
+    name: coffee-cluster
+
+---
+apiVersion: infrastructure.cluster.x-k8s.io/v1alpha1
+kind: ProxmoxCluster
+metadata:
+  name: coffee-cluster
+  namespace: default
+spec:
+  allowedNodes:
+  - pve
+  controlPlaneEndpoint:
+    host: 192.168.100.200
+    port: 6443
+  dnsServers:
+  - 8.8.8.8
+  - 8.8.4.4
+  ipv4Config:
+    addresses:
+    - 192.168.100.210-192.168.100.219
+    gateway: 192.168.100.1
+    prefix: 24
+  schedulerHints:
+    memoryAdjustment: 0

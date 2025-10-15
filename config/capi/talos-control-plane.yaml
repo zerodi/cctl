@@ -1,0 +1,72 @@
+apiVersion: controlplane.cluster.x-k8s.io/v1alpha3
+kind: TalosControlPlane
+metadata:
+  name: coffee-cluster-control-plane
+  namespace: default
+spec:
+  version: v1.34.0
+  replicas: 1
+  infrastructureTemplate:
+    apiVersion: infrastructure.cluster.x-k8s.io/v1alpha1
+    kind: ProxmoxMachineTemplate
+    name: coffee-cluster-control-plane-template
+    namespace: default
+  controlPlaneConfig:
+    controlplane:
+      generateType: controlplane
+      configPatches:
+      - op: add
+        path: /machine/install/extraKernelArgs
+        value:
+          - net.ifnames=0
+      - op: add
+        path: /machine/network/interfaces
+        value:
+        - interface: eth0
+          dhcp: false
+          vip:
+            ip: 192.168.100.200
+      # 1) Prepare Talos for Cilium: do not install the Talos CNI
+      - op: add
+        path: /cluster/network/cni
+        value:
+          name: none
+      # 1.1) (optional) enable kube-proxy-free mode for Cilium
+      - op: add
+        path: /cluster/proxy
+        value:
+          disabled: true
+      # === Explicitly enable KubePrism (local API endpoint) ===
+      - op: add
+        path: /machine/features/kubePrism
+        value:
+          enabled: true
+          port: 7445
+      - op: add
+        path: /machine/features/hostDNS
+        value:
+          enabled: true
+          forwardKubeDNSToHost: true
+      - op: add
+        path: /cluster/discovery
+        value:
+          enabled: false
+          registries:
+            kubernetes:
+              disabled: true
+            service:
+              disabled: true
+      # === DRBD for LINSTOR: load kernel modules on nodes ===
+      # The DRBD system extension must be included in the Talos image ahead of time (Image Factory)
+      # - op: add
+      #   path: /machine/kernel/modules
+      #   value:
+      #     - name: drbd
+      #       parameters:
+      #         - usermode_helper=disabled
+      #     - name: drbd_transport_tcp
+      # - op: add
+      #   path: /machine/nodeLabels
+      #   value:
+      #     storage.talos.dev/linstor: "true"
+               
